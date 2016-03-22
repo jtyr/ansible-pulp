@@ -4,25 +4,38 @@
   service:
     name: "{{ pulp_web_service }}"
     state: restarted
+  when: >
+    pulp_web_service_started is not defined or
+    not pulp_web_service_started.changed
 
 - name: Restart Pulp Workers service
   service:
     name: pulp_workers
     state: restarted
+  when: >
+    pulp_workers_service_started is not defined or
+    not pulp_workers_service_started.changed
 
 - name: Restart Pulp Celerybeat service
   service:
     name: pulp_celerybeat
     state: restarted
-  when: pulp_run_celerybeat
+  when: >
+    pulp_celerybeat_service_started is not defined or
+    not pulp_celerybeat_service_started.changed
 
 - name: Restart Pulp Resource Manager service
   service:
     name: pulp_resource_manager
     state: restarted
-  when: pulp_run_resource_manager
+  when: >
+    pulp_resource_manager_service_started is not defined or
+    not pulp_resource_manager_service_started.changed
 
 - name: Restart goferd service
   service:
     name: goferd
     state: restarted
+  when: >
+    pulp_goferd_service_started is not defined or
+    not pulp_goferd_service_started.changed

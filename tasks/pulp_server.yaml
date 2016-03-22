@@ -69,6 +69,7 @@
   service:
     name: "{{ pulp_web_service }}"
     state: running
+  register: pulp_web_service_started
   tags:
     - pulp_service
 
@@ -83,6 +84,7 @@
   service:
     name: pulp_workers
     state: running
+  register: pulp_workers_service_started
   tags:
     - pulp_service
 
@@ -99,6 +101,7 @@
     name: pulp_celerybeat
     state: running
   when: pulp_run_celerybeat
+  register: pulp_celerybeat_service_started
   tags:
     - pulp_service
 
@@ -115,5 +118,6 @@
     name: pulp_resource_manager
     state: running
   when: pulp_run_resource_manager
+  register: pulp_resource_manager_service_started
   tags:
     - pulp_service
