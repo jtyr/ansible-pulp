@@ -1,22 +1,22 @@
 ---
 
-- name: Restart Apache service
+- name: Restart Web service
   service:
-    name: httpd
+    name: "{{ pulp_web_service }}"
     state: restarted
 
-- name: Restart Pulp workers service
+- name: Restart Pulp Workers service
   service:
     name: pulp_workers
     state: restarted
 
-- name: Restart Pulp celerybeat service
+- name: Restart Pulp Celerybeat service
   service:
     name: pulp_celerybeat
     state: restarted
   when: pulp_run_celerybeat
 
-- name: Restart Pulp resource manager service
+- name: Restart Pulp Resource Manager service
   service:
     name: pulp_resource_manager
     state: restarted

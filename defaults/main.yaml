@@ -1,8 +1,5 @@
 ---
 
-# Whether to install Qpid server as a dependency of this role
-pulp_install_qpid: false
-
 # Whether to install Pulp server
 pulp_install_server: false
 
@@ -20,18 +17,17 @@ pulp_run_celerybeat: false
 # (should run only on one Pulp server)
 pulp_run_resource_manager: false
 
-# Apply patch
-pulp_patch: true
+# Web service name
+pulp_web_service: httpd
 
-# Repo URL
-pulp_yum_repo_url: https://repos.fedorapeople.org/repos/pulp/pulp/stable/latest/$releasever/$basearch/
+# Web service user
+pulp_web_service_user: apache
 
-# Default YUM repository
-pulp_yumrepo_repos:
-  pulp:
-    name: Pulp Project repository
-    baseurl: "{{ pulp_yum_repo_url }}"
-    gpgcheck: 0
+# YUM repo URL
+pulp_yumrepo_url: https://repos.fedorapeople.org/repos/pulp/pulp/stable/latest/$releasever/$basearch/
+
+# Additionl YUM repo params
+pulp_yumrepo_params: {}
 
 # Default YUM group for Pulp server
 pulp_server_pkgs:
@@ -57,78 +53,216 @@ pulp_host: localhost.localdomain
 pulp_qpidd_config:
   auth: 'no'
 
-# Default Pulp server configuration
-pulp_server_config:
-  database: {}
-  server: {}
-  authentication: {}
-  security: {}
-  consumer_history: {}
-  data_reaping: {}
-  oauth: {}
-  messaging: {}
-  tasks: {}
-  email: {}
 
-# Default parameters of the Pulp workers configuration
-pulp_workers_celeryd_log_file: /var/log/pulp/%n.log
-pulp_workers_celeryd_log_level: INFO
-pulp_workers_celeryd_pid_file: /var/run/pulp/%n.pid
-pulp_workers_pythonencoding: UTF-8
-pulp_workers_pulp_concurrency: "{{ ansible_processor_cores }}"
+# Default content of the Pulp Server sections
+pulp_server_config_database: {}
+pulp_server_config_server: {}
+pulp_server_config_authentication: {}
+pulp_server_config_security: {}
+pulp_server_config_consumer_history: {}
+pulp_server_config_data_reaping: {}
+pulp_server_config_oauth: {}
+pulp_server_config_messaging: {}
+pulp_server_config_tasks: {}
+pulp_server_config_email: {}
 
-# Default Pulp workers configuration
-pulp_workers_config:
-  # Workers variables which can be changed
-  celeryd_log_file: "{{ pulp_workers_celeryd_log_file }}"
-  celeryd_log_level: "{{ pulp_workers_celeryd_log_level }}"
-  celeryd_pid_file: "{{ pulp_workers_celeryd_pid_file }}"
-  pythonioencoding: "{{ pulp_workers_pythonencoding }}"
-  pulp_concurrency: "{{ pulp_workers_pulp_concurrency }}"
-  # Workers variables which should not be changed
-  celery_app: pulp.server.async.app
-  celery_create_dirs: 1
-  celeryd_nodes: ""
-  celeryd_opts: "-c 1 --events --umask=18"
-  celeryd_user: apache
-  default_nodes: ""
+# Default Pulp Server config sections
+pulp_server_config__default:
+  database: "{{ pulp_server_config_database }}"
+  server: "{{ pulp_server_config_server }}"
+  authentication: "{{ pulp_server_config_authentication }}"
+  security: "{{ pulp_server_config_security }}"
+  consumer_history: "{{ pulp_server_config_consumer_history }}"
+  data_reaping: "{{ pulp_server_config_data_reaping }}"
+  oauth: "{{ pulp_server_config_oauth }}"
+  messaging: "{{ pulp_server_config_messaging }}"
+  tasks: "{{ pulp_server_config_tasks }}"
+  email: "{{ pulp_server_config_email }}"
 
-# Default Pulp admin config file path
-pulp_admin_config_file: /etc/pulp/admin/admin.conf
+# Custom Pulp Server config sections
+pulp_server_config__custom: {}
 
-# Default Pulp admin configuration
-pulp_admin_config:
-  server:
-    host: "{{ pulp_host }}"
-    verify_ssl: "{{ pulp_verify_ssl }}"
-  client: {}
-  filesystem: {}
-  logging: {}
-  output: {}
+# Final Pulp Server config
+pulp_server_config: "{{
+  pulp_server_config__default.update(pulp_server_config__custom) }}{{
+  pulp_server_config__default }}"
 
-# Default Pulp consumer configuration
-pulp_consumer_config:
-  server:
-    host: "{{ pulp_host }}"
-    verify_ssl: "{{ pulp_verify_ssl }}"
-  authentication: {}
-  client: {}
-  filesystem: {}
-  reboot: {}
-  logging: {}
-  output: {}
-  messaging: {}
-  profile: {}
 
-# Default Pulp repo_auth configuration
-pulp_server_repo_auth_config:
-  main:
-    enabled: false
-    log_failed_cert: true
-    log_failed_cert_verbose: false
-    max_num_certs_in_chain: 100
-    verify_ssl: "{{ pulp_verify_ssl }}"
-  repos:
-    cert_location: /etc/pki/pulp/content
-    global_cert_location: /etc/pki/pulp/content
-    protected_repo_listing_file: /etc/pki/pulp/content/pulp-protected-repos
+# Default option values of the Pulp Workers config
+pulp_workers_config_celeryd_log_file: /var/log/pulp/%n.log
+pulp_workers_config_celeryd_log_level: INFO
+pulp_workers_config_celeryd_pid_file: /var/run/pulp/%n.pid
+pulp_workers_config_pythonencoding: UTF-8
+pulp_workers_config_pulp_concurrency: "{{ ansible_processor_cores }}"
+pulp_workers_config_celery_app: pulp.server.async.app
+pulp_workers_config_celery_create_dirs: 1
+pulp_workers_config_celeryd_nodes: ""
+pulp_workers_config_celeryd_opts: "-c 1 --events --umask=18"
+pulp_workers_config_celeryd_user: "{{ pulp_web_service_user }}"
+pulp_workers_config_default_nodes: ""
+
+# Default Pulp Workers config options
+pulp_workers_config__default:
+  celeryd_log_file: "{{ pulp_workers_config_celeryd_log_file }}"
+  celeryd_log_level: "{{ pulp_workers_config_celeryd_log_level }}"
+  celeryd_pid_file: "{{ pulp_workers_config_celeryd_pid_file }}"
+  pythonioencoding: "{{ pulp_workers_config_pythonencoding }}"
+  pulp_concurrency: "{{ pulp_workers_config_pulp_concurrency }}"
+  celery_app: "{{ pulp_workers_config_celery_app }}"
+  celery_create_dirs: "{{ pulp_workers_config_celery_create_dirs }}"
+  celeryd_nodes: "{{ pulp_workers_config_celeryd_nodes }}"
+  celeryd_opts: "{{ pulp_workers_config_celeryd_opts }}"
+  celeryd_user: "{{ pulp_workers_config_celeryd_user }}"
+  default_nodes: "{{ pulp_workers_config_default_nodes }}"
+
+# Default Pulp Workers config options
+pulp_workers_config__custom: {}
+
+# Final Pulp Workers config
+pulp_workers_config: "{{
+  pulp_workers_config__default.update(pulp_workers_config__custom) }}{{
+  pulp_workers_config__default }}"
+
+
+# Default values of the options of the server section of the Pulp Admin config
+pulp_admin_config_server_host: "{{ pulp_host }}"
+pulp_admin_config_server_verify_ssl: "{{ pulp_verify_ssl }}"
+
+# Default options of the server section of the Pulp Admin config
+pulp_admin_config_server__default:
+  host: "{{ pulp_admin_config_server_host }}"
+  verify_ssl: "{{ pulp_admin_config_server_verify_ssl }}"
+
+# Custom options of the server section of the Pulp Admin config
+pulp_admin_config_server__custom: {}
+
+# Final server section of the Pulp Admin config
+pulp_admin_config_server: "{{
+  pulp_admin_config_server__default.update(pulp_admin_config_server__custom) }}{{
+  pulp_admin_config_server__default }}"
+
+# Default content of the other section of the Pulp Admin config
+pulp_admin_config_client: {}
+pulp_admin_config_filesystem: {}
+pulp_admin_config_logging: {}
+pulp_admin_config_output: {}
+
+# Default Pulp Admin config sections
+pulp_admin_config__default:
+  server: "{{ pulp_admin_config_server }}"
+  client: "{{ pulp_admin_config_client }}"
+  filesystem: "{{ pulp_admin_config_filesystem }}"
+  logging: "{{ pulp_admin_config_logging }}"
+  output: "{{ pulp_admin_config_output }}"
+
+# Custom Pulp Admin config sections
+pulp_admin_config__custom: {}
+
+# Final Pulp Admin config
+pulp_admin_config: "{{
+  pulp_admin_config__default.update(pulp_admin_config__custom) }}{{
+  pulp_admin_config__default }}"
+
+
+# Default values of the options of the server section of the Pulp Consumer config
+pulp_consumer_config_server_host: "{{ pulp_host }}"
+pulp_consumer_config_server_verify_ssl: "{{ pulp_verify_ssl }}"
+
+# Default options of the server section of the Pulp Consumer config
+pulp_consumer_config_server__default:
+  host: "{{ pulp_consumer_config_server_host }}"
+  verify_ssl: "{{ pulp_consumer_config_server_verify_ssl }}"
+
+# Custom options of the server section of the Pulp Consumer config
+pulp_consumer_config_server__custom: {}
+
+# Final server section of the Pulp Customer config
+pulp_consumer_config_server: "{{
+  pulp_consumer_config_server__default.update(pulp_consumer_config_server__custom) }}{{
+  pulp_consumer_config_server__default }}"
+
+# Default content of other sections of the Pulp Consumer config
+pulp_consumer_config_authentication: {}
+pulp_consumer_config_client: {}
+pulp_consumer_config_filesystem: {}
+pulp_consumer_config_reboot: {}
+pulp_consumer_config_logging: {}
+pulp_consumer_config_output: {}
+pulp_consumer_config_messaging: {}
+pulp_consumer_config_profile: {}
+
+# Default sections of the Pulp Consumer config
+pulp_consumer_config__default:
+  server: "{{ pulp_consumer_config_server }}"
+  authentication: "{{ pulp_consumer_config_authentication }}"
+  client: "{{ pulp_consumer_config_client }}"
+  filesystem: "{{ pulp_consumer_config_filesystem }}"
+  reboot: "{{ pulp_consumer_config_reboot }}"
+  logging: "{{ pulp_consumer_config_logging }}"
+  output: "{{ pulp_consumer_config_output }}"
+  messaging: "{{ pulp_consumer_config_messaging }}"
+  profile: "{{ pulp_consumer_config_profile }}"
+
+# Custom sections of the Pulp Customer config
+pulp_consumer_config__custom: {}
+
+# Final Pulp Customer config
+pulp_consumer_config: "{{
+  pulp_consumer_config__default.update(pulp_consumer_config__custom) }}{{
+  pulp_consumer_config__default }}"
+
+
+# Default values of the options of the main section of the Pulp repo_auth config
+pulp_repo_auth_config_main_enabled: false
+pulp_repo_auth_config_main_log_failed_cert: true
+pulp_repo_auth_config_main_log_failed_cert_verbose: false
+pulp_repo_auth_config_main_max_num_certs_in_chain: 100
+pulp_repo_auth_config_main_verify_ssl: "{{ pulp_verify_ssl }}"
+
+# Default options of the main section of the Pulp repo_auth config
+pulp_repo_auth_config_main__default:
+  enabled: "{{ pulp_repo_auth_config_main_enabled }}"
+  log_failed_cert: "{{ pulp_repo_auth_config_main_log_failed_cert }}"
+  log_failed_cert_verbose: "{{ pulp_repo_auth_config_main_log_failed_cert_verbose }}"
+  max_num_certs_in_chain: "{{ pulp_repo_auth_config_main_max_num_certs_in_chain }}"
+  verify_ssl: "{{ pulp_repo_auth_config_main_verify_ssl }}"
+
+# Custom options of the main section of the Pulp repo_auth config
+pulp_repo_auth_config_main__custom: {}
+
+# Final main section of the Pulp repo_auth config
+pulp_repo_auth_config_main: "{{
+  pulp_repo_auth_config_main__default.update(pulp_repo_auth_config_main__custom) }}{{
+  pulp_repo_auth_config_main__default }}"
+
+# Default values of the options of the repos section of the Pulp repo_auth config
+pulp_repo_auth_config_repos_cert_location: /etc/pki/pulp/content
+pulp_repo_auth_config_repos_global_cert_location: /etc/pki/pulp/content
+pulp_repo_auth_config_repos_protected_repo_listing_file: /etc/pki/pulp/content/pulp-protected-repos
+
+# Default options of the repos section of the Pulp repo_auth config
+pulp_repo_auth_config_repos__default:
+  cert_location: "{{ pulp_repo_auth_config_repos_cert_location }}"
+  global_cert_location: "{{ pulp_repo_auth_config_repos_global_cert_location }}"
+  protected_repo_listing_file: "{{ pulp_repo_auth_config_repos_protected_repo_listing_file }}"
+
+# Custom options of the repos section of the Pulp repo_auth config
+pulp_repo_auth_config_repos__custom: {}
+
+# Final repos section of the Pulp repo_auth config
+pulp_repo_auth_config_repos: "{{
+  pulp_repo_auth_config_repos__default.update(pulp_repo_auth_config_repos__custom) }}{{
+  pulp_repo_auth_config_repos__default }}"
+
+# Default sections of the Pulp repo_auth config
+pulp_repo_auth_config__default:
+  main: "{{ pulp_repo_auth_config_main }}"
+  repos: "{{ pulp_repo_auth_config_repos }}"
+
+# Custom sections of the Pulp repo_auth config
+pulp_repo_auth_config__custom: {}
+
+# Final Pulp repo_auth config
+pulp_repo_auth_config: "{{
+  pulp_repo_auth_config__default.update(pulp_repo_auth_config__custom) }}{{
+  pulp_repo_auth_config__default }}"

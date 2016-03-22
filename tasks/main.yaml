@@ -4,11 +4,18 @@
   assert:
     that: ansible_os_family == "RedHat"
 
+- name: Create YUM repo file
+  yum_repository:
+    name: pulp
+    description: Pulp Project repository
+    baseurl: "{{ pulp_yumrepo_url }}"
+    gpgcheck: 0
+    params: "{{ pulp_yumrepo_params }}"
+  tags:
+    - pulp_pkg
+
 - include: pulp_server.yaml
   when: pulp_install_server
-
-- include: pulp_patch.yaml
-  when: pulp_patch
 
 - include: pulp_admin.yaml
   when: pulp_install_admin

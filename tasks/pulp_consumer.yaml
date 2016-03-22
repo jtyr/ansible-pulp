@@ -1,15 +1,15 @@
 ---
 
-- name: Install Pulp consumer client and agent
-  yum:
+- name: Install Pulp Consumer client and agent
+  package:
     name: "{{ item }}"
-  with_items: pulp_consumer_pkgs
+  with_items: "{{ pulp_consumer_pkgs }}"
   notify:
     - Restart goferd service
   tags:
     - pulp_pkg
 
-- name: Configure Pulp server
+- name: Configure Pulp Consumer
   template:
     src: consumer.conf.j2
     dest: /etc/pulp/consumer/consumer.conf
@@ -18,7 +18,16 @@
   tags:
     - pulp_config
 
-- name: Make the goferd service running
+- name: Enable the goferd service
+  service:
+    name: goferd
+    enabled: yes
+  tags:
+    - pulp_service
+
+- name: Run the goferd service
   service:
     name: goferd
     state: running
+  tags:
+    - pulp_service

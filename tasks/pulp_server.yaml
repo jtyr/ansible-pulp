@@ -1,26 +1,26 @@
 ---
 
-- name: Install Pulp server
+- name: Install Pulp Server
   yum:
     name: "{{ item }}"
-  with_items: pulp_server_pkgs
+  with_items: "{{ pulp_server_pkgs }}"
   notify:
-    - Restart Apache service
-    - Restart Pulp workers service
-    - Restart Pulp celerybeat service
-    - Restart Pulp resource manager service
+    - Restart Web service
+    - Restart Pulp Workers service
+    - Restart Pulp Celerybeat service
+    - Restart Pulp Resource Manager service
   tags:
     - pulp_pkg
 
-- name: Configure Pulp server
+- name: Configure Pulp Server
   template:
     src: server.conf.j2
     dest: /etc/pulp/server.conf
   notify:
-    - Restart Apache service
-    - Restart Pulp workers service
-    - Restart Pulp celerybeat service
-    - Restart Pulp resource manager service
+    - Restart Web service
+    - Restart Pulp Workers service
+    - Restart Pulp Celerybeat service
+    - Restart Pulp Resource Manager service
   tags:
     - pulp_config
 
@@ -30,56 +30,90 @@
   register: db_init
 
 - name: Initialize Pulp's DB
-  shell: sudo -u apache pulp-manage-db && touch /var/lib/pulp/db_initialized.flag
+  shell: su - {{ pulp_web_service_user }} -s /bin/bash -c pulp-manage-db && touch /var/lib/pulp/db_initialized.flag
   notify:
-    - Restart Apache service
-    - Restart Pulp workers service
-    - Restart Pulp celerybeat service
-    - Restart Pulp resource manager service
+    - Restart Web service
+    - Restart Pulp Workers service
+    - Restart Pulp Celerybeat service
+    - Restart Pulp Resource Manager service
   when: not db_init.stat.exists
 
-- name: Configure workers
+- name: Configure Pulp Workers
   template:
     src: pulp_workers.j2
     dest: /etc/default/pulp_workers
   notify:
-    - Restart Pulp workers service
+    - Restart Pulp Workers service
   tags:
     - pulp_config
 
-- name: Configure repo authentication
+- name: Configure Pulp Repo Authentication
   template:
     src: repo_auth.conf.j2
     dest: /etc/pulp/repo_auth.conf
   notify:
-    - Restart Pulp workers service
-    - Restart Pulp celerybeat service
-    - Restart Pulp resource manager service
+    - Restart Pulp Workers service
+    - Restart Pulp Celerybeat service
+    - Restart Pulp Resource Manager service
   tags:
     - pulp_config
 
-- name: Make Apache server running
+- name: Enable Web service
   service:
-    name: httpd
+    name: "{{ pulp_web_service }}"
     enabled: yes
-    state: running
+  tags:
+    - pulp_service
 
-- name: Make Pulp workers running
+- name: Run Web service
+  service:
+    name: "{{ pulp_web_service }}"
+    state: running
+  tags:
+    - pulp_service
+
+- name: Enable Pulp Workers service
   service:
     name: pulp_workers
     enabled: yes
-    state: running
+  tags:
+    - pulp_service
 
-- name: Make Pulp celerybeat running
+- name: Run Pulp Workers service
+  service:
+    name: pulp_workers
+    state: running
+  tags:
+    - pulp_service
+
+- name: Enable Pulp Celerybeat service
   service:
     name: pulp_celerybeat
     enabled: yes
+  when: pulp_run_celerybeat
+  tags:
+    - pulp_service
+
+- name: Run Pulp Celerybeat service
+  service:
+    name: pulp_celerybeat
     state: running
   when: pulp_run_celerybeat
+  tags:
+    - pulp_service
 
-- name: Make Pulp resource manager running
+- name: Enable Pulp Resource Manager service
   service:
     name: pulp_resource_manager
     enabled: yes
+  when: pulp_run_resource_manager
+  tags:
+    - pulp_service
+
+- name: Run Pulp Resource Manager service
+  service:
+    name: pulp_resource_manager
     state: running
   when: pulp_run_resource_manager
+  tags:
+    - pulp_service
