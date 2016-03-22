@@ -467,7 +467,6 @@ Dependencies
 ------------
 
 - [`mongodb`](https://github.com/jtyr/ansible-mongodb) role (optional)
-- [`nginx`](https://github.com/jtyr/ansible-nginx) role (optional)
 - [`qpid_cpp_server`](https://github.com/jtyr/ansible-qpid_cpp_server) role (optional)
 - [`rabbitmq`](https://github.com/jtyr/ansible-rabbitmq) role (optional)
 - [Config Encoders](https://github.com/jtyr/ansible/blob/jtyr-config_encoders/lib/ansible/plugins/filter/config_encoders.py)
