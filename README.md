@@ -6,7 +6,7 @@ in single host installation but it should be possible to spread the Pulp service
 across multiple hosts and even use different messaging tool than Qpid (e.g.
 RabbitMQ).
 
-The configuraton of the role is done in such way that it should not be necessary
+The configuration of the role is done in such way that it should not be necessary
 to change the role for any kind of configuration. All can be done either by
 changing role parameters or by declaring completely new configuration as a
 variable. That makes this role absolutely universal. See the examples below for
@@ -174,18 +174,6 @@ system. Again, I did not test it but the setup should look something like this:
           ...
         ...
 ```
-
-This role requires [Config
-Encoders](https://github.com/jtyr/ansible/blob/jtyr-config_encoders/lib/ansible/plugins/filter/config_encoders.py)
-which must be configured in the `ansible.cfg` file like this:
-
-```
-[defaults]
-
-filter_plugins = ./plugins/filter/
-```
-
-Where the `./plugins/filter/` containes the `config_encoders.py` file.
 
 
 Role variables
@@ -466,10 +454,10 @@ pulp_repo_auth_config: "{{
 Dependencies
 ------------
 
+- [`config_encoder_filters`](https://github.com/jtyr/ansible-config_encoder_filters)
 - [`mongodb`](https://github.com/jtyr/ansible-mongodb) role (optional)
 - [`qpid_cpp_server`](https://github.com/jtyr/ansible-qpid_cpp_server) role (optional)
 - [`rabbitmq`](https://github.com/jtyr/ansible-rabbitmq) role (optional)
-- [Config Encoders](https://github.com/jtyr/ansible/blob/jtyr-config_encoders/lib/ansible/plugins/filter/config_encoders.py)
 
 
 License
