@@ -24,6 +24,18 @@
   tags:
     - pulp_config
 
+- name: Configure Pulp Server Plugins
+  template:
+    src: plugins.conf.j2
+    dest:  /etc/pulp/server/plugins.conf.d/{{ item.key }}.json
+  notify:
+    - Restart Pulp Workers service
+    - Restart Pulp Celerybeat service
+    - Restart Pulp Resource Manager service
+  with_dict: "{{ pulp_server_plugins_config }}"
+  tags:
+    - pulp_config
+
 - name: Check if Pulp's DB was initialized
   stat:
     path: /var/lib/pulp/db_initialized.flag

@@ -270,6 +270,15 @@ pulp_server_config: "{{
   pulp_server_config__default }}"
 
 
+# Pulp Server Plugins configuration
+pulp_server_plugins_config: {}
+# Example:
+#pulp_server_plugins_config:
+#  yum_importer:
+#    proxy_url: http://192.168.1.100
+#    proxy_port: 3128
+
+
 # Default option values of the Pulp Workers config
 pulp_workers_config_celeryd_log_file: /var/log/pulp/%n.log
 pulp_workers_config_celeryd_log_level: INFO
