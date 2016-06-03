@@ -275,7 +275,7 @@ pulp_server_plugins_config: {}
 # Example:
 #pulp_server_plugins_config:
 #  yum_importer:
-#    proxy_url: http://192.168.1.100
+#    proxy_host: http://192.168.1.100
 #    proxy_port: 3128
 
 

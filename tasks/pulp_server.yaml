@@ -29,6 +29,7 @@
     src: plugins.conf.j2
     dest:  /etc/pulp/server/plugins.conf.d/{{ item.key }}.json
   notify:
+    - Restart Web service
     - Restart Pulp Workers service
     - Restart Pulp Celerybeat service
     - Restart Pulp Resource Manager service
