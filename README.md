@@ -26,23 +26,27 @@ which worked for me:
 
 # Example of a single host installation
 - hosts: myhost
+  vars:
+    # MongoDB configuration
+    mongodb_net_bindIp: 127.0.0.1
+    mongodb_net_wireObjectCheck: false
+    mongodb_net_unixDomainSocket_enabled: true
+    mongodb_processManagement_fork: true
+    mongodb_systemLog_logAppend: true
+    mongodb_systemLog_timeStampFormat: iso8601-utc
+    # Qpid configuration
+    qpid_cpp_server_qpidd_config:
+      auth: 'no'
+    # Pulp configuration
+    pulp_install_server: true
+    pulp_install_admin: true
+    pulp_install_consumer: true
+    pulp_run_celerybeat: true
+    pulp_run_resource_manager: true
   roles:
-    - role: mongodb
-      mongodb_net_bindIp: 127.0.0.1
-      mongodb_net_wireObjectCheck: false
-      mongodb_net_unixDomainSocket_enabled: true
-      mongodb_processManagement_fork: true
-      mongodb_systemLog_logAppend: true
-      mongodb_systemLog_timeStampFormat: iso8601-utc
-    - role: qpid_cpp_server
-      qpid_cpp_server_qpidd_config:
-        auth: 'no'
-    - role: pulp
-      pulp_install_server: true
-      pulp_install_admin: true
-      pulp_install_consumer: true
-      pulp_run_celerybeat: true
-      pulp_run_resource_manager: true
+    - mongodb
+    - qpid_cpp_server
+    - pulp
 ```
 
 After everything is installed, you can use the following commands to create a clone of a repo:
@@ -64,68 +68,74 @@ it. The setup should look something like this:
 
 # Mongo DB server
 - hosts: pulp-mongodb
+  vars:
+    mongodb_net_bindIp: 0.0.0.0
+    mongodb_net_wireObjectCheck: false
+    mongodb_net_unixDomainSocket_enabled: true
+    mongodb_processManagement_fork: true
+    mongodb_systemLog_logAppend: true
+    mongodb_systemLog_timeStampFormat: iso8601-utc
   roles:
-    - role: mongodb
-      mongodb_net_bindIp: 0.0.0.0
-      mongodb_net_wireObjectCheck: false
-      mongodb_net_unixDomainSocket_enabled: true
-      mongodb_processManagement_fork: true
-      mongodb_systemLog_logAppend: true
-      mongodb_systemLog_timeStampFormat: iso8601-utc
+    - mongodb
 
 # Messaging server
 - hosts: pulp-messaging
+  vars:
+    # Configure Qpid for multi-host setup
+    qpid_cpp_server_qpidd_config:
+      ...
   roles:
     # We can use the qpid role directly
-    - role: qpid_cpp_server
-      # Configure Qpid for multi-host setup
-      qpid_cpp_server_qpidd_config:
-        ...
+    - qpid_cpp_server
 
 # First Pulp server
 - hosts: pulp-server1
+  vars:
+    pulp_install_server: true
+    # Only the first Pulp server will run these two services
+    pulp_run_celerybeat: true
+    pulp_run_resource_manager: true
+    # Configure Pulp server for multi-host setup
+    pulp_server_config:
+      ...
+    # Configure repo_auth
+    pulp_server_repo_auth_config:
+      ...
   roles:
-    - role: pulp
-      pulp_install_server: true
-      # Only the first Pulp server will run these two services
-      pulp_run_celerybeat: true
-      pulp_run_resource_manager: true
-      # Configure Pulp server for multi-host setup
-      pulp_server_config:
-        ...
-      # Configure repo_auth
-      pulp_server_repo_auth_config:
-        ...
+    - pulp
 
 # Second Pulp server
 - hosts: pulp-server2
+  vars:
+    pulp_install_server: true
+    # Configure Pulp server for multi-host setup
+    pulp_server_config:
+      ...
+    # Configure repo_auth
+    pulp_server_repo_auth_config:
+      ...
   roles:
-    - role: pulp
-      pulp_install_server: true
-      # Configure Pulp server for multi-host setup
-      pulp_server_config:
-        ...
-      # Configure repo_auth
-      pulp_server_repo_auth_config:
-        ...
+    - pulp
 
 # Pulp admin
 - hosts: pulp-admin
+  vars:
+    pulp_install_admin: true
+    # Configure Pulp admin for multi-host setup
+    pulp_admin_config:
+      ...
   roles:
-    - role: pulp
-      pulp_install_admin: true
-      # Configure Pulp admin for multi-host setup
-      pulp_admin_config:
-        ...
+    - pulp
 
 # Pulp customer
 - hosts: pulp-consumer
+  vars:
+    pulp_install_consumer: true
+    # Configure Pulp consumer for multi-host setup
+    pulp_consumer_config:
+      ...
   roles:
-    - role: pulp
-      pulp_install_consumer: true
-      # Configure Pulp consumer for multi-host setup
-      pulp_consumer_config:
-        ...
+    - pulp
 ```
 
 It should also be possible to use RabbitMQ instead of the default Qpid messaging
@@ -136,43 +146,46 @@ system. Again, I did not test it but the setup should look something like this:
 
 # Example how to setup Pulp with RabbitMQ on a single host
 - hosts: myhost
-  roles:
-    - role: mongodb
-      mongodb_net_bindIp: 127.0.0.1
-      mongodb_net_wireObjectCheck: false
-      mongodb_net_unixDomainSocket_enabled: true
-      mongodb_processManagement_fork: true
-      mongodb_systemLog_logAppend: true
-      mongodb_systemLog_timeStampFormat: iso8601-utc
+  vars:
+    # MongoDB configuration
+    mongodb_net_bindIp: 127.0.0.1
+    mongodb_net_wireObjectCheck: false
+    mongodb_net_unixDomainSocket_enabled: true
+    mongodb_processManagement_fork: true
+    mongodb_systemLog_logAppend: true
+    mongodb_systemLog_timeStampFormat: iso8601-utc
     # Get some rabbitmq role and configure it (see https://github.com/jtyr/ansible-rabbitmq)
-    - role: rabbitmq
-       ...
-    - role: pulp
-      pulp_install_server: true
-      pulp_install_admin: true
-      pulp_install_consumer: true
-      pulp_run_celerybeat: true
-      pulp_run_resource_manager: true
-      # The server and customer YUM groups are different for RabbitMQ
-      pulp_server_pkgs:
-        - "@pulp-server"
-        - python-gofer-amqplib
-      pulp_consumer_pkgs:
-        - "@pulp-consumer"
-        - python-gofer-amqplib
-      # You will probably need to change some configuration
-      pulp_server_config:
-        messaging:
-          transport: rabbitmq
-          broker_url: amqp://guest:guest@localhost/foo
-          ...
+      ...
+    # Pulp configuration
+    pulp_install_server: true
+    pulp_install_admin: true
+    pulp_install_consumer: true
+    pulp_run_celerybeat: true
+    pulp_run_resource_manager: true
+    # The server and customer YUM groups are different for RabbitMQ
+    pulp_server_pkgs:
+      - "@pulp-server"
+      - python-gofer-amqplib
+    pulp_consumer_pkgs:
+      - "@pulp-consumer"
+      - python-gofer-amqplib
+    # You will probably need to change some configuration
+    pulp_server_config:
+      messaging:
+        transport: rabbitmq
+        broker_url: amqp://guest:guest@localhost/foo
         ...
-      pulp_consumer_config:
-        messaging:
-          transport: rabbitmq
-          broker_url: amqp://guest:guest@localhost/foo
-          ...
+      ...
+    pulp_consumer_config:
+      messaging:
+        transport: rabbitmq
+        broker_url: amqp://guest:guest@localhost/foo
         ...
+      ...
+  roles:
+    - mongodb
+    - rabbitmq
+    - pulp
 ```
 
 
