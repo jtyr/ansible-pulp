@@ -9,7 +9,7 @@
     name: pulp
     description: Pulp Project repository
     baseurl: "{{ pulp_yumrepo_url }}"
-    gpgcheck: 0
+    gpgkey: "{{ pulp_yumrepo_gpgkey }}"
     params: "{{ pulp_yumrepo_params }}"
   tags:
     - pulp_pkg

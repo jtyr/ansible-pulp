@@ -1,7 +1,7 @@
 ---
 
 - name: Install Pulp Server
-  yum:
+  package:
     name: "{{ item }}"
   with_items: "{{ pulp_server_pkgs }}"
   notify:

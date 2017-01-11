@@ -26,6 +26,9 @@ pulp_web_service_user: apache
 # YUM repo URL
 pulp_yumrepo_url: https://repos.fedorapeople.org/repos/pulp/pulp/stable/latest/$releasever/$basearch/
 
+# YUM repo URL
+pulp_yumrepo_gpgkey: https://repos.fedorapeople.org/repos/pulp/pulp/GPG-RPM-KEY-pulp-2
+
 # Additionl YUM repo params
 pulp_yumrepo_params: {}
 
