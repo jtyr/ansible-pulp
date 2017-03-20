@@ -218,8 +218,14 @@ pulp_web_service: httpd
 # Web service user
 pulp_web_service_user: apache
 
+# Web service group
+pulp_web_service_group: apache
+
 # YUM repo URL
 pulp_yumrepo_url: https://repos.fedorapeople.org/repos/pulp/pulp/stable/latest/$releasever/$basearch/
+
+# YUM repo URL
+pulp_yumrepo_gpgkey: https://repos.fedorapeople.org/repos/pulp/pulp/GPG-RPM-KEY-pulp-2
 
 # Additionl YUM repo params
 pulp_yumrepo_params: {}
@@ -279,8 +285,8 @@ pulp_server_config__custom: {}
 
 # Final Pulp Server config
 pulp_server_config: "{{
-  pulp_server_config__default.update(pulp_server_config__custom) }}{{
-  pulp_server_config__default }}"
+  pulp_server_config__default |
+  combine(pulp_server_config__custom) }}"
 
 
 # Pulp Server Plugins configuration
@@ -324,8 +330,8 @@ pulp_workers_config__custom: {}
 
 # Final Pulp Workers config
 pulp_workers_config: "{{
-  pulp_workers_config__default.update(pulp_workers_config__custom) }}{{
-  pulp_workers_config__default }}"
+  pulp_workers_config__default |
+  combine(pulp_workers_config__custom) }}"
 
 
 # Default values of the options of the server section of the Pulp Admin config
@@ -342,8 +348,8 @@ pulp_admin_config_server__custom: {}
 
 # Final server section of the Pulp Admin config
 pulp_admin_config_server: "{{
-  pulp_admin_config_server__default.update(pulp_admin_config_server__custom) }}{{
-  pulp_admin_config_server__default }}"
+  pulp_admin_config_server__default |
+  combine(pulp_admin_config_server__custom) }}"
 
 # Default content of the other section of the Pulp Admin config
 pulp_admin_config_client: {}
@@ -364,8 +370,8 @@ pulp_admin_config__custom: {}
 
 # Final Pulp Admin config
 pulp_admin_config: "{{
-  pulp_admin_config__default.update(pulp_admin_config__custom) }}{{
-  pulp_admin_config__default }}"
+  pulp_admin_config__default |
+  combine (pulp_admin_config__custom) }}"
 
 
 # Default values of the options of the server section of the Pulp Consumer config
@@ -382,8 +388,8 @@ pulp_consumer_config_server__custom: {}
 
 # Final server section of the Pulp Customer config
 pulp_consumer_config_server: "{{
-  pulp_consumer_config_server__default.update(pulp_consumer_config_server__custom) }}{{
-  pulp_consumer_config_server__default }}"
+  pulp_consumer_config_server__default |
+  combine(pulp_consumer_config_server__custom) }}"
 
 # Default content of other sections of the Pulp Consumer config
 pulp_consumer_config_authentication: {}
@@ -412,8 +418,8 @@ pulp_consumer_config__custom: {}
 
 # Final Pulp Customer config
 pulp_consumer_config: "{{
-  pulp_consumer_config__default.update(pulp_consumer_config__custom) }}{{
-  pulp_consumer_config__default }}"
+  pulp_consumer_config__default |
+  combine(pulp_consumer_config__custom) }}"
 
 
 # Default values of the options of the main section of the Pulp repo_auth config
@@ -436,8 +442,8 @@ pulp_repo_auth_config_main__custom: {}
 
 # Final main section of the Pulp repo_auth config
 pulp_repo_auth_config_main: "{{
-  pulp_repo_auth_config_main__default.update(pulp_repo_auth_config_main__custom) }}{{
-  pulp_repo_auth_config_main__default }}"
+  pulp_repo_auth_config_main__default |
+  combine(pulp_repo_auth_config_main__custom) }}"
 
 # Default values of the options of the repos section of the Pulp repo_auth config
 pulp_repo_auth_config_repos_cert_location: /etc/pki/pulp/content
@@ -455,8 +461,8 @@ pulp_repo_auth_config_repos__custom: {}
 
 # Final repos section of the Pulp repo_auth config
 pulp_repo_auth_config_repos: "{{
-  pulp_repo_auth_config_repos__default.update(pulp_repo_auth_config_repos__custom) }}{{
-  pulp_repo_auth_config_repos__default }}"
+  pulp_repo_auth_config_repos__default |
+  combine(pulp_repo_auth_config_repos__custom) }}"
 
 # Default sections of the Pulp repo_auth config
 pulp_repo_auth_config__default:
@@ -468,8 +474,8 @@ pulp_repo_auth_config__custom: {}
 
 # Final Pulp repo_auth config
 pulp_repo_auth_config: "{{
-  pulp_repo_auth_config__default.update(pulp_repo_auth_config__custom) }}{{
-  pulp_repo_auth_config__default }}"
+  pulp_repo_auth_config__default |
+  combine(pulp_repo_auth_config__custom) }}"
 ```
 
 
@@ -478,6 +484,7 @@ Dependencies
 
 - [`config_encoder_filters`](https://github.com/jtyr/ansible-config_encoder_filters)
 - [`mongodb`](https://github.com/jtyr/ansible-mongodb) role (optional)
+- [`pulp_repos`](https://github.com/jtyr/ansible-pulp_repos) role (optional)
 - [`qpid_cpp_server`](https://github.com/jtyr/ansible-qpid_cpp_server) role (optional)
 - [`rabbitmq`](https://github.com/jtyr/ansible-rabbitmq) role (optional)
 

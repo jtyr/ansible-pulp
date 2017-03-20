@@ -28,6 +28,9 @@
   template:
     src: plugins.conf.j2
     dest:  /etc/pulp/server/plugins.conf.d/{{ item.key }}.json
+    owner: "{{ pulp_web_service_user }}"
+    group: "{{ pulp_web_service_group }}"
+    mode: 0640
   notify:
     - Restart Web service
     - Restart Pulp Workers service
