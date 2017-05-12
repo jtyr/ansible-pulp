@@ -28,7 +28,7 @@
 - name: Run the goferd service
   service:
     name: goferd
-    state: running
+    state: started
   register: pulp_goferd_service_started
   tags:
     - pulp_service

@@ -15,10 +15,10 @@
     - pulp_pkg
 
 - include: pulp_server.yaml
-  when: pulp_install_server
+  when: pulp_install_server == true
 
 - include: pulp_admin.yaml
-  when: pulp_install_admin
+  when: pulp_install_admin == true
 
 - include: pulp_consumer.yaml
-  when: pulp_install_consumer
+  when: pulp_install_consumer == true

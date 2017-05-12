@@ -84,7 +84,7 @@
 - name: Run Web service
   service:
     name: "{{ pulp_web_service }}"
-    state: running
+    state: started
   register: pulp_web_service_started
   tags:
     - pulp_service
@@ -99,7 +99,7 @@
 - name: Run Pulp Workers service
   service:
     name: pulp_workers
-    state: running
+    state: started
   register: pulp_workers_service_started
   tags:
     - pulp_service
@@ -108,15 +108,15 @@
   service:
     name: pulp_celerybeat
     enabled: yes
-  when: pulp_run_celerybeat
+  when: pulp_run_celerybeat == true
   tags:
     - pulp_service
 
 - name: Run Pulp Celerybeat service
   service:
     name: pulp_celerybeat
-    state: running
-  when: pulp_run_celerybeat
+    state: started
+  when: pulp_run_celerybeat == true
   register: pulp_celerybeat_service_started
   tags:
     - pulp_service
@@ -125,15 +125,15 @@
   service:
     name: pulp_resource_manager
     enabled: yes
-  when: pulp_run_resource_manager
+  when: pulp_run_resource_manager == true
   tags:
     - pulp_service
 
 - name: Run Pulp Resource Manager service
   service:
     name: pulp_resource_manager
-    state: running
-  when: pulp_run_resource_manager
+    state: started
+  when: pulp_run_resource_manager == true
   register: pulp_resource_manager_service_started
   tags:
     - pulp_service
