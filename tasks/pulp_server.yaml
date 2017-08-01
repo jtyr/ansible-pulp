@@ -48,7 +48,7 @@
     - pulp_config
 
 - name: Initialize Pulp's DB
-  shell: su - {{ pulp_web_service_user }} -s /bin/bash -c pulp-manage-db && touch /var/lib/pulp/db_initialized.flag
+  shell: env su - {{ pulp_web_service_user }} -s /bin/bash -c pulp-manage-db && touch /var/lib/pulp/db_initialized.flag
   notify:
     - Restart Web service
     - Restart Pulp Workers service
