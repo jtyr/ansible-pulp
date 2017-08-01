@@ -58,14 +58,14 @@
   tags:
     - pulp_config
 
-- name: Check if Pulp's CA exists
+- name: Check if CA certificate exists
   stat:
     path: /etc/pki/pulp/ca.crt
   register: pulp_ca_file_check
   tags:
     - pulp_config
 
-- name: Run pulp-gen-ca-certificate
+- name: Create CA certificate
   shell: pulp-gen-ca-certificate
   notify:
     - Restart Web service
