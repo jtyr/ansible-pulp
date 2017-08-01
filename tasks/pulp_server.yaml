@@ -44,6 +44,8 @@
   stat:
     path: /var/lib/pulp/db_initialized.flag
   register: db_init
+  tags:
+    - pulp_config
 
 - name: Initialize Pulp's DB
   shell: su - {{ pulp_web_service_user }} -s /bin/bash -c pulp-manage-db && touch /var/lib/pulp/db_initialized.flag
@@ -53,6 +55,26 @@
     - Restart Pulp Celerybeat service
     - Restart Pulp Resource Manager service
   when: not db_init.stat.exists
+  tags:
+    - pulp_config
+
+- name: Check if Pulp's CA exists
+  stat:
+    path: /etc/pki/pulp/ca.crt
+  register: ca_file
+  tags:
+    - pulp_config
+
+- name: Run pulp-gen-ca-certificate
+  command: pulp-gen-ca-certificate
+  notify:
+    - Restart Web service
+    - Restart Pulp Workers service
+    - Restart Pulp Celerybeat service
+    - Restart Pulp Resource Manager service
+  when: not ca_file.stat.exists
+  tags:
+    - pulp_config
 
 - name: Configure Pulp Workers
   template:
