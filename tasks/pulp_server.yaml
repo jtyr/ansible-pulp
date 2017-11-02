@@ -76,6 +76,14 @@
   tags:
     - pulp_config
 
+- name: Create Pulp RSA keypair
+  shell: pulp-gen-key-pair
+  notify:
+    - Restart Web Service
+  creates: /etc/pki/pulp/rsa.key
+  tags:
+    - pulp_config
+
 - name: Configure Pulp Workers
   template:
     src: pulp_workers.j2
